@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<center>
+    <div class="card">
+        <h2>Registration Failed</h2><br>
+        <p>{{ message }}</p><br>
+        
+            
+            <a href="{{ url_for('register_form') }}"><button class="btn btn-outline">Try Again</button></a>
+            
+        
+        
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "faculty_base.html" %}
+{% block content %}
+<center>
+    <div class="card"> 
+        <h2>Faculty Dashboard</h2><br>
+        <h3>Classes</h3><br>
+        <table class="styled-table">
+            <tr>
+                <th>Class</th>
+                <th>Download Attendance</th>
+            </tr>
+            {% for class_name in classes %}
+            <tr>
+                <td>{{ class_name[0] }}</td>
+                <td><a href="{{ url_for('download_attendance', class_name=class_name[0]) }}" class="btn">Download</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</center>
+{% endblock %}

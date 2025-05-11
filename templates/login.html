@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceTrack - Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4D44DB;
+            --accent: #FF6584;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --gradient: linear-gradient(135deg, #6C63FF 0%, #4D44DB 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+        
+        .auth-container {
+            position: relative;
+            z-index: 1;
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .auth-header {
+            background: var(--gradient);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .auth-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            background: #f0f0f0;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .auth-tab.active {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .auth-content {
+            padding: 30px;
+        }
+        
+        .auth-form {
+            display: none;
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+        
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            color: #777;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .error-message {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h2>Welcome to FaceTrack</h2>
+            <p>Smart Attendance System</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+            <div class="auth-tab" onclick="switchTab('register')">Register</div>
+        </div>
+        
+        <div class="auth-content">
+            <!-- Login Form -->
+
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+                {% endif %}
+            <div id="login-form" class="auth-form">
+                <div class="login-container">
+                <h2>Login</h2><br>
+                <form action="{{ url_for('login') }}" method="POST">
+                    <div class="input-group">
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" id="username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password:</label>
+                        <input type="password" name="password" id="password" required>
+                    </div>
+                   <button class="btn btn-primary" type="submit" >Login</button>
+                </form>
+                <div class="auth-footer">
+                        Don't have an account? <a href="#" onclick="switchTab('register')">Register here</a>
+                    </div>
+            </div>
+            <!-- <p>Don't have an account? <a href="{{ url_for('register_faculty') }}">Register Now</a></p> -->
+        </div>
+        
+            
+            <!-- Registration Form -->
+             
+            <div id="register-form" class="auth-form">
+                
+
+                <div class="login-container">
+                    <h2>Register</h2><br>
+                    <form action="{{ url_for('register_user') }}" method="POST">
+                        <div class="input-group">
+                            <label for="username">Username:</label>
+                            <input type="text" name="username" id="username" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Password:</label>
+                            <input type="password" name="password" id="password" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email:</label>
+                            <input type="email" name="email" id="email" required>
+                        </div>
+                    
+                    
+                        
+                        <button class="btn btn-primary" type="submit" >Create Account</button>
+                        
+                        
+            </form>
+                <div class="auth-footer">
+                            Already have an account? <a href="#" onclick="switchTab('login')">Login here</a>
+                        </div>
+            
+            </div>
+        </div>
+        </div>
+    </div>
+    
+
+    <script>
+        // DOM Elements
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        
+        // Switch between login and register tabs
+        function switchTab(tab) {
+            if (tab === 'login') {
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.querySelector('.auth-tab:nth-child(2)').classList.remove('active');
+                clearMessages();
+            } else {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+                document.querySelector('.auth-tab:nth-child(1)').classList.remove('active');
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                clearMessages();
+            }
+        }
+
+    </script>
+</body>
+</html>
+
